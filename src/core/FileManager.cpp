@@ -93,7 +93,7 @@ void FileManager::saveData(int size, bool completed, int cost, int iteration, do
     }
 
     // GraphName; Size; Iteration; Completed; Cost; Time; TempStart; TempEnd; CoolingRate; EpochIterations; InitialSolution; CoolingType
-    file << fileName << size << ";" << iteration << ";" << completed << ";" << cost
+    file << fileName << ";" << size << ";" << iteration << ";" << completed << ";" << cost
         << ";" << timeMs << ";" << tempStart << ";" << tempEnd << ";" << coolingRate
         << ";" << epochIterations << ";" << initialSolutionToString(initialSolution)<<";"<<coolingTypeToString(cooling) << "\n";
 

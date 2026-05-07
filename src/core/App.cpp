@@ -17,8 +17,9 @@ App::App() {
 
 void App::run() {
     while (true) {
+//        3 10000 0.0001 0.99 0 15000 1000 0 0 ../data/ATSP/ftv47.atsp
         // Arguments:
-        std::cout<<"\nDane wejsciowe algorytmu: <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf>  <sciezka_grafu>\n"
+        std::cout<<"\nDane wejsciowe algorytmu: <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf> <sciezka_grafu>\n"
                    "\t<iteracje>: Liczba iteracji >0\n"
                    "\t<temp_pocz>: Temperatura poczatkowa [double]\n"
                    "\t<temp_konc>: Temperatura koncowa [double]\n"
@@ -43,7 +44,7 @@ void App::run() {
         std::string inputPath="";
 
         // Parse arguments to string
-        std::string args[9] = {};
+        std::string args[10] = {};
         std::stringstream ss(input);
         int i = 0;
         while (ss >> args[i]) {
@@ -57,6 +58,8 @@ void App::run() {
         // Check arguments
         bool check = true;
         // <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf> <sciezka_grafu>
+        // 3 10000 0.0001 0.99 0 15000 1000 0 0 ../data/ATSP/ftv47.atsp
+
         check *= checkInt(args[0], iterations);
         check *= checkDouble(args[1], tempStart);
         check *= checkDouble(args[2], tempEnd);
@@ -93,8 +96,8 @@ void App::run() {
 
             sa->solve(graph);
             sa->print();
-
-            fileManager.saveData(graphSize, sa->getCompleted(), sa->getCost(), i+1, tempStart, tempEnd, coolingRate, epochIterations, sa->getTimeMs(), initialSolution, coolingType);
+            fileManager.saveData(graphSize, sa->getCompleted(), sa->getCost(), i+1, sa->getInitialTemp(), sa->getEndingTemp(), sa->getCoolingRate(),
+                sa->getEpochIterations(), sa->getTimeMs(), sa->getInitSolutionType(), sa->getCoolingType());
             delete sa;
         }
         delete graph;
@@ -131,7 +134,7 @@ bool App::checkBool(std::string arg, bool& value) {
 bool App::checkInitialSolution(std::string arg, InitSolution& initialSolution) {
     if (arg == "0")
         initialSolution = InitSolution::RANDOM;
-    if (arg == "1")
+    else if (arg == "1")
         initialSolution = InitSolution::NN;
     else if (arg == "2")
         initialSolution = InitSolution::RNN;
