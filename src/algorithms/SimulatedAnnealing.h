@@ -4,16 +4,10 @@
 
 #ifndef SIMULATEDANNEALING_H
 #define SIMULATEDANNEALING_H
-
 #include <random>
-
 #include "../core/Graph.h"
-
 #include "../utils/parameters.h"
 #include "../utils/Timer.h"
-
-// 4.5 CoolingScheme
-// 3.5 InitSolution
 
 class SimulatedAnnealing {
 public:

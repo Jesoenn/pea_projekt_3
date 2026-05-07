@@ -5,10 +5,6 @@
 #ifndef APP_H
 #define APP_H
 #include <string>
-
-#include "FileManager.h"
-#include "Graph.h"
-#include "../include/answers.h"
 #include "../utils/parameters.h"
 
 

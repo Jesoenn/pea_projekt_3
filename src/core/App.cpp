@@ -5,8 +5,6 @@
 #include "App.h"
 
 #include <iostream>
-#include <utility>
-
 #include "FileManager.h"
 #include "../algorithms/SimulatedAnnealing.h"
 #include "../utils/Timer.h"
