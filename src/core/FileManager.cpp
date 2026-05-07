@@ -79,38 +79,40 @@ Graph* FileManager::loadGraphOld() {
     return graph;
 }
 
-void FileManager::saveData(Algorithm algorithm, int size, bool completed, int time, bool isFileInput, int cost, int iteration, InitialSolution initialSolution) {
+void FileManager::saveData(int size, bool completed, int cost, int iteration, double tempStart, double tempEnd, double coolingRate,
+        int epochIterations, int timeMs, InitSolution initialSolution, CoolingType cooling) {
     std::ofstream file(outputFileName, std::ios_base::app);
     if (!file.is_open())
         throw std::invalid_argument("File could not be opened");
 
-    // Iteration; Algorithm; Size; Cost; Completed; Time; Input Type; Initial Solution
-    file << iteration << ";" << algorithmToString(algorithm) << ";" << size << ";" << cost << ";" << completed
-        << ";" << time << ";" << inputToString(isFileInput) << ";" << initialSolutionToString(initialSolution) << "\n";
+    // Delete all characters before last /
+    std::string fileName = inputFileName;
+    size_t pos;
+    while ((pos = fileName.find('/')) != std::string::npos) {
+        fileName.erase(0, pos + 1);
+    }
+
+    // GraphName; Size; Iteration; Completed; Cost; Time; TempStart; TempEnd; CoolingRate; EpochIterations; InitialSolution; CoolingType
+    file << fileName << size << ";" << iteration << ";" << completed << ";" << cost
+        << ";" << timeMs << ";" << tempStart << ";" << tempEnd << ";" << coolingRate
+        << ";" << epochIterations << ";" << initialSolutionToString(initialSolution)<<";"<<coolingTypeToString(cooling) << "\n";
+
     file.close();
 }
 
-std::string FileManager::inputToString(bool isFileInput) {
-    if (isFileInput)
-        return "FILE";
-    return "RANDOM";
-}
-
-std::string FileManager::algorithmToString(Algorithm algorithm) {
-    switch (algorithm) {
-        case Algorithm::BF: return "BF";
-        case Algorithm::DEPTH: return "DFS";
-        case Algorithm::BREADTH: return "BREADTH";
-        case Algorithm::BEST: return "BEST";
-        default: return "ERROR";
-    }
-}
-
-std::string FileManager::initialSolutionToString(InitialSolution initialSolution) {
+std::string FileManager::initialSolutionToString(InitSolution initialSolution) {
     switch (initialSolution) {
-        case InitialSolution::NN: return "NN";
-        case InitialSolution::RNN: return "RNN";
+        case InitSolution::RANDOM: return "RANDOM";
+        case InitSolution::NN: return "NN";
+        case InitSolution::RNN: return "RNN";
         default: return "ERROR";
     }
 }
 
+std::string FileManager::coolingTypeToString(CoolingType cooling) {
+    switch (cooling) {
+        case CoolingType::EXPONENTIAL: return "EXPONENTIAL";
+        case CoolingType::LINEAR: return "LINEAR";
+        default: return "ERROR";
+    }
+}

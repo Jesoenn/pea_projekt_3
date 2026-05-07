@@ -7,9 +7,7 @@
 #include <string>
 
 #include "Graph.h"
-#include "../include/algorithms.h"
-#include "../include/inital_solutions.h"
-#include "../include/inputs.h"
+#include "../utils/parameters.h"
 
 
 class FileManager {
@@ -18,14 +16,13 @@ public:
 
     Graph* loadGraph();
     Graph* loadGraphOld();
-    void saveData(Algorithm algorithm, int size, bool completed, int time, bool isFileInput, int cost, int iteration, InitialSolution initialSolution);
+    void saveData(int size, bool completed, int cost, int iteration, double tempStart, double tempEnd, double coolingRate,
+        int epochIterations, int timeMs, InitSolution initialSolution, CoolingType cooling);
 
 private:
     std::string inputFileName, outputFileName;
-
-    static std::string inputToString(bool isFileInput);
-    static std::string algorithmToString(Algorithm algorithm);
-    static std::string initialSolutionToString(InitialSolution initialSolution);
+    static std::string initialSolutionToString(InitSolution initialSolution);
+    static std::string coolingTypeToString(CoolingType cooling);
 };
 
 

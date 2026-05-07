@@ -33,8 +33,17 @@ public:
     void setMaxTimeMs(int ms);
 
     // Getters
+    double getInitialTemp() const;
+    double getEndingTemp() const;
+    double getCoolingRate() const;
+    int getEpochIterations() const;
+    CoolingType getCoolingType() const;
+    InitSolution getInitSolutionType() const;
+    int getTime() const;
     int* getAns() const;
+    int getCost() const;
     int getTimeMs() const;
+    bool getCompleted() const;
 
 private:
     Timer timer;
@@ -52,7 +61,7 @@ private:
     int* bestPath;
     int bestCost;
     int size;
-    long long executionTimeMs;
+    int executionTimeMs;
 
     int* generateInitialSolution(int size, Graph* graph);
     double decreaseTemperature(double currentTemp);

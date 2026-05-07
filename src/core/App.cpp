@@ -8,10 +8,7 @@
 #include <utility>
 
 #include "FileManager.h"
-#include "../algorithms/BestSolver.h"
-#include "../algorithms/BFSolver.h"
-#include "../algorithms/BreadthSolver.h"
-#include "../algorithms/DepthSolver.h"
+#include "../algorithms/SimulatedAnnealing.h"
 #include "../utils/Timer.h"
 
 
@@ -21,131 +18,87 @@ App::App() {
 void App::run() {
     while (true) {
         // Arguments:
-        std::cout<<"\nDane wejsciowe algorytmu: <algorytm> <rozmiar> <iteracje> <czas_maks> <wyswietl_graf> <rozw_poczatkowe> [sciezka_grafu]\n"
-                   "\t<algorytm>: 0 - DFS, 1 - BREADTH, 2 - BEST, 3 - ALL, 4 - BF, 5 - ALL BEZ BF, 6 - DFS i BEST\n"
-                   "\t<rozmiar>: Rozmiar problemu N lub \"-\" jezeli podana sciezka grafu\n"
+        std::cout<<"\nDane wejsciowe algorytmu: <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf>  <sciezka_grafu>\n"
                    "\t<iteracje>: Liczba iteracji >0\n"
+                   "\t<temp_pocz>: Temperatura poczatkowa [double]\n"
+                   "\t<temp_konc>: Temperatura koncowa [double]\n"
+                   "\t<ochladzanie>: Wspolczynnik ochladzania (0,1)\n"
+                   "\t<typ_ochladzania>: 0 - Exponential, 1 - Linear\n"
                    "\t<czas_maks>: [ms]\n"
+                   "\t<iteracje_epoki>: Liczba iteracji w jednej epoce >0\n"
+                   "\t<rozw_poczatkowe>: 0 - RANDOM, 1 - NN, 2 - RNN\n"
                    "\t<wyswietl_graf>: 1 - Tak, 0 - Nie\n"
-                   "\t<rozw_poczatkowe>: 0 - NN, 1 - RNN\n"
-                   "\t[sciezka_grafu]: Relatywna do lokalizacji pliku wykonywalnego\n"
+                   "\t<sciezka_grafu>: Relatywna do lokalizacji pliku wykonywalnego\n"
                    "\nWejscie: ";
+
         std::string input;
         std::getline(std::cin, input);
 
         // Program arguments
-        bool isFileInput = false;
-        Algorithm algorithm;
-        int size, iterations, maxTime;
+        double tempStart, tempEnd, coolingRate;
+        int iterations, maxTime, epochIterations;
         bool printGraph;
-        InitialSolution initialSolution;
+        InitSolution initialSolution;
+        CoolingType coolingType;
         std::string inputPath="";
 
         // Parse arguments to string
-        std::string args[7] = {};
+        std::string args[9] = {};
         std::stringstream ss(input);
         int i = 0;
         while (ss >> args[i]) {
             i++;
         }
-        if (i > 7 || i < 6) {
-            std::cout<<"Niepoprawna liczba argumentow\n";
+        if (i != 10) {
+            std::cout << "Niepoprawna liczba argumentow\n";
             continue;
         }
 
-        if (i==7)   // argument [sciezka_grafu] was given
-            isFileInput = true;
-
         // Check arguments
         bool check = true;
-        check *= checkAlgorithm(args[0], algorithm);
-        check *= checkSize(args[1], size, isFileInput);
-        check *= checkInt(args[2], iterations);
-        check *= checkInt(args[3], maxTime);
-        check *= checkBool(args[4], printGraph);
-        check *= checkInitialSolution(args[5], initialSolution);
-        if (isFileInput)
-            inputPath = args[6];
+        // <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf> <sciezka_grafu>
+        check *= checkInt(args[0], iterations);
+        check *= checkDouble(args[1], tempStart);
+        check *= checkDouble(args[2], tempEnd);
+        check *= checkDouble(args[3], coolingRate);
+        check *= checkCoolingScheme(args[4], coolingType);
+        check *= checkInt(args[5], maxTime);
+        check *= checkInt(args[6], epochIterations);
+        check *= checkInitialSolution(args[7], initialSolution);
+        check *= checkBool(args[8], printGraph);
+        inputPath = args[9];
         if (!check)
             continue;
 
         // Get graph
         FileManager fileManager(inputPath, "wyniki_jf.csv");
-        Graph* graph = nullptr;
-        if (isFileInput) {
-            graph = fileManager.loadGraph();
-        } else {
-            graph = new Graph(size);
-        }
+        Graph* graph = fileManager.loadGraph();
+        int graphSize = graph->getSize();
 
         for (int i = 0; i < iterations; i++) {
-            // Setup graph
-            if (!isFileInput)
-                graph->generate();
             std::cout<<"====================================================\n"
                        "Iteracja "<<i+1<<" z "<<iterations<<"\n"
                        "====================================================\n";
             if (printGraph)
                 graph->print();
 
-            // Run algorithms
-            if (algorithm == Algorithm::DEPTH || algorithm == Algorithm::ALL || algorithm == Algorithm::ALL_WITHOUT_BF || algorithm == Algorithm::DFS_AND_BEST)
-                runAlgorithm(Algorithm::DEPTH, graph, fileManager, isFileInput, i, maxTime, initialSolution);
-            if (algorithm == Algorithm::BREADTH || algorithm == Algorithm::ALL || algorithm == Algorithm::ALL_WITHOUT_BF)
-                runAlgorithm(Algorithm::BREADTH, graph, fileManager, isFileInput, i, maxTime, initialSolution);
-            if (algorithm == Algorithm::BEST || algorithm == Algorithm::ALL || algorithm == Algorithm::ALL_WITHOUT_BF || algorithm == Algorithm::DFS_AND_BEST)
-                runAlgorithm(Algorithm::BEST, graph, fileManager, isFileInput, i, maxTime, initialSolution);
-            if (algorithm == Algorithm::BF || algorithm == Algorithm::ALL)
-                runAlgorithm(Algorithm::BF, graph, fileManager, isFileInput, i, maxTime, initialSolution);
-        }
+            SimulatedAnnealing* sa = new SimulatedAnnealing();
+            sa->setInitialTemp(tempStart);
+            sa->setEndingTemp(tempEnd);
+            sa->setCoolingRate(coolingRate);
+            sa->setCoolingType(coolingType);
+            sa->setEpochIterations(epochIterations);
+            sa->setInitSolutionType(initialSolution);
+            sa->setMaxTimeMs(maxTime);
 
+            sa->solve(graph);
+            sa->print();
+
+            fileManager.saveData(graphSize, sa->getCompleted(), sa->getCost(), i+1, tempStart, tempEnd, coolingRate, epochIterations, sa->getTimeMs(), initialSolution, coolingType);
+            delete sa;
+        }
         delete graph;
     }
-}
-
-void App::runAlgorithm(Algorithm algorithm, Graph* graph, FileManager& fileManager, bool isFileInput, int iteration, int maxTime, InitialSolution initialSolution) {
-    ISolver *solver = nullptr;
-    switch (algorithm) {
-        case Algorithm::BF: solver = new BFSolver(); break;
-        case Algorithm::DEPTH: solver = new DepthSolver(maxTime, initialSolution); break;
-        case Algorithm::BREADTH: solver = new BreadthSolver(maxTime, initialSolution); break;
-        case Algorithm::BEST: solver = new BestSolver(maxTime, initialSolution); break;
-        default: {
-            std::cout<<"Niepoprawny wybor algorytmu - ustawiono Brute Force.\n";
-            solver = new BFSolver();
-        }
-    }
-
-    solver->solve(graph);
-    solver->print();
-    // Sava data to file
-    fileManager.saveData(algorithm, graph->getSize(), solver->getCompleted(), solver->getTimeMs(), isFileInput, solver->getCost(), iteration, initialSolution);
-
-    delete solver;
-}
-
-bool App::checkAlgorithm(const std::string& arg, Algorithm& algorithm) {
-    // 0 - DFS, 1 - BREADTH, 2 - BEST, 3 - ALL, 4 - BF, 5 ALL WITHOUT BF
-    bool correct = true;
-    if (arg == "0")
-        algorithm = Algorithm::DEPTH;
-    else if (arg == "1")
-        algorithm = Algorithm::BREADTH;
-    else if (arg == "2")
-        algorithm = Algorithm::BEST;
-    else if (arg == "3")
-        algorithm = Algorithm::ALL;
-    else if (arg == "4")
-        algorithm = Algorithm::BF;
-    else if (arg == "5")
-        algorithm = Algorithm::ALL_WITHOUT_BF;
-    else if (arg == "6")
-        algorithm = Algorithm::DFS_AND_BEST;
-    else {
-        correct = false;
-        std::cout<<"Niepoprawny algorytm\n";
-    }
-    return correct;
 }
 
 bool App::checkSize(std::string arg, int& value, bool isFileInput) {
@@ -175,14 +128,38 @@ bool App::checkBool(std::string arg, bool& value) {
     return false;
 }
 
-bool App::checkInitialSolution(std::string arg, InitialSolution& initialSolution) {
+bool App::checkInitialSolution(std::string arg, InitSolution& initialSolution) {
     if (arg == "0")
-        initialSolution = InitialSolution::NN;
-    else if (arg == "1")
-        initialSolution = InitialSolution::RNN;
+        initialSolution = InitSolution::RANDOM;
+    if (arg == "1")
+        initialSolution = InitSolution::NN;
+    else if (arg == "2")
+        initialSolution = InitSolution::RNN;
     else {
         std::cout<<"Niepoprawne rozwiazanie poczatkowe\n";
         return false;
     }
     return true;
+}
+
+bool App::checkCoolingScheme(std::string arg, CoolingType& coolingScheme) {
+    if (arg == "0")
+        coolingScheme = CoolingType::EXPONENTIAL;
+    else if (arg == "1")
+        coolingScheme = CoolingType::LINEAR;
+    else {
+        std::cout<<"Niepoprawny typ ochladzania\n";
+        return false;
+    }
+    return true;
+}
+
+bool App::checkDouble(const std::string& arg, double& value) {
+    try {
+        value = std::stod(arg);
+        return true;
+    } catch (...) {
+        std::cout << "Niepoprawna liczba zmiennoprzecinkowa\n";
+        return false;
+    }
 }

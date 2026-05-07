@@ -23,6 +23,8 @@ SimulatedAnnealing::SimulatedAnnealing() {
     executionTimeMs = 0;
     bestPath = nullptr;
     endingTemp = 0.0001;
+    countEpochs = 0;
+    size = -1;
     gen = std::mt19937(rd());
 }
 
@@ -51,11 +53,49 @@ void SimulatedAnnealing::setInitSolutionType(InitSolution type) {
 void SimulatedAnnealing::setMaxTimeMs(int ms) {
     maxTimeMs = ms;
 }
+
+double SimulatedAnnealing::getInitialTemp() const {
+    return initialTemp;
+}
+
+double SimulatedAnnealing::getEndingTemp() const {
+    return endingTemp;
+}
+
+double SimulatedAnnealing::getCoolingRate() const {
+    return coolingRate;
+}
+
+int SimulatedAnnealing::getEpochIterations() const {
+    return epochIterations;
+}
+
+CoolingType SimulatedAnnealing::getCoolingType() const {
+    return coolingScheme;
+}
+
+InitSolution SimulatedAnnealing::getInitSolutionType() const {
+    return initType;
+}
+
+int SimulatedAnnealing::getTime() const {
+    return executionTimeMs;
+}
+
 int* SimulatedAnnealing::getAns() const {
     return bestPath;
 }
+
+int SimulatedAnnealing::getCost() const {
+    return bestCost;
+}
+
 int SimulatedAnnealing::getTimeMs() const {
     return timer.result();
+}
+
+bool SimulatedAnnealing::getCompleted() const {
+    return timer.result() < maxTimeMs;
 }
 
 int* SimulatedAnnealing::generateInitialSolution(int size, Graph* graph) {
@@ -125,7 +165,7 @@ int SimulatedAnnealing::solve(Graph* graph) {
     while (temp > endingTemp) {
         // std::cout<<"Epoch: "<<countEpochs<<"\nTemp: "<<temp<<"\n";
         // Check every epoch if time limit achieved
-        if (timer.result() >= maxTimeMs) {
+        if (timer.result() > maxTimeMs) {
             std::cout << "Time limit achieved" << std::endl;
             break;
         }
