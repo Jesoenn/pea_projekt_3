@@ -22,7 +22,7 @@ void App::run() {
                    "\t<temp_pocz>: Temperatura poczatkowa [double]\n"
                    "\t<temp_konc>: Temperatura koncowa [double]\n"
                    "\t<ochladzanie>: Wspolczynnik ochladzania (0,1)\n"
-                   "\t<typ_ochladzania>: 0 - Exponential, 1 - Linear\n"
+                   "\t<typ_ochladzania>: 0 - Exponential, 1 - Linear, 2 - Logarithmic\n"
                    "\t<czas_maks>: [ms]\n"
                    "\t<iteracje_epoki>: Liczba iteracji w jednej epoce >0\n"
                    "\t<rozw_poczatkowe>: 0 - RANDOM, 1 - NN, 2 - RNN\n"
@@ -148,6 +148,8 @@ bool App::checkCoolingScheme(std::string arg, CoolingType& coolingScheme) {
         coolingScheme = CoolingType::EXPONENTIAL;
     else if (arg == "1")
         coolingScheme = CoolingType::LINEAR;
+    else if (arg == "2")
+        coolingScheme = CoolingType::LOGARITHMIC;
     else {
         std::cout<<"Niepoprawny typ ochladzania\n";
         return false;

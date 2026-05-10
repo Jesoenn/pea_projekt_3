@@ -113,6 +113,7 @@ std::string FileManager::coolingTypeToString(CoolingType cooling) {
     switch (cooling) {
         case CoolingType::EXPONENTIAL: return "EXPONENTIAL";
         case CoolingType::LINEAR: return "LINEAR";
+        case CoolingType::LOGARITHMIC: return "LOGARITHMIC";
         default: return "ERROR";
     }
 }

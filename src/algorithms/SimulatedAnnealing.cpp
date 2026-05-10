@@ -134,7 +134,8 @@ double SimulatedAnnealing::decreaseTemperature(double currentTemp) {
         return currentTemp * coolingRate;
     if (coolingScheme == CoolingType::LINEAR)
         return currentTemp - coolingRate;
-
+    if (coolingScheme == CoolingType::LOGARITHMIC)
+        return initialTemp / std::log(1 + countEpochs);
     return currentTemp * 0.99;
 }
 
@@ -172,6 +173,7 @@ int SimulatedAnnealing::solve(Graph* graph) {
 
         // Epochs
         countEpochs++;
+        std::cout<<"Temp: "<<temp<<"\nCost: "<<currentCost<<"\n";
         for (int i = 0; i < epochIterations; i++) {
             // Generate random swap
             int v1 = dist(gen);

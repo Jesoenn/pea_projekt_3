@@ -7,7 +7,8 @@
 
 enum class CoolingType {
     EXPONENTIAL,
-    LINEAR
+    LINEAR,
+    LOGARITHMIC
 };
 
 enum class InitSolution {
