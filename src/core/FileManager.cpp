@@ -34,7 +34,9 @@ Graph* FileManager::loadGraph() {
     }
 
     if (size <= 0 || !sectionFound) {
-        throw std::runtime_error("Wrong ATSP format.");
+        // Check if graph in old format
+        file.close();
+        return loadGraphOld();
     }
 
     Graph* graph = new Graph(size);

@@ -158,6 +158,7 @@ int SimulatedAnnealing::solve(Graph* graph) {
     bestPath = new int[size];
     copy(currentPath, bestPath, size);
     bestCost = currentCost;
+    initialCost = currentCost;
 
     // Current parameters
     double temp = initialTemp;
@@ -173,7 +174,7 @@ int SimulatedAnnealing::solve(Graph* graph) {
 
         // Epochs
         countEpochs++;
-        std::cout<<"Temp: "<<temp<<"\nCost: "<<currentCost<<"\n";
+        // std::cout<<"Temp: "<<temp<<"\nCost: "<<currentCost<<"\n";
         for (int i = 0; i < epochIterations; i++) {
             // Generate random swap
             int v1 = dist(gen);
@@ -221,7 +222,8 @@ void SimulatedAnnealing::print() {
         std::cout << bestPath[i] << " ";
     }
 
-    std::cout << "\n\tCost = "<<bestCost<<std::endl;
+    std::cout<<"\n\tInitial solution cost: "<<initialCost<<std::endl;
+    std::cout << "\tCost = "<<bestCost<<std::endl;
     std::cout<<"\tEpochs = "<<countEpochs<<std::endl;
     std::cout<<"\tTime = "<<executionTimeMs<<" ms"<<std::endl;
 }

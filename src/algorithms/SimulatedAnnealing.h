@@ -53,7 +53,7 @@ private:
     InitSolution initType;
 
     int* bestPath;
-    int bestCost;
+    int bestCost, initialCost;
     int size;
     int executionTimeMs;
 
