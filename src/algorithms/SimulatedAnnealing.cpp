@@ -98,6 +98,20 @@ bool SimulatedAnnealing::getCompleted() const {
     return timer.result() < maxTimeMs;
 }
 
+void SimulatedAnnealing::moveVertex(int* path, int from, int to) {
+    int temp = path[from];
+    if (from < to) {
+        for (int i = from; i < to; i++) {
+            path[i] = path[i + 1];
+        }
+    } else {
+        for (int i = from; i > to; i--) {
+            path[i] = path[i - 1];
+        }
+    }
+    path[to] = temp;
+}
+
 int* SimulatedAnnealing::generateInitialSolution(int size, Graph* graph) {
     int* path = new int[size];
     if (initType == InitSolution::RANDOM) {
@@ -183,12 +197,13 @@ int SimulatedAnnealing::solve(Graph* graph) {
                 v2 = dist(gen);
             }
 
-            swap(currentPath, v1, v2);
+            moveVertex(currentPath, v1, v2);
+
             int newCost = calculateCost(currentPath, size, graph);
             int deltaCost = newCost - currentCost;
 
             // If cost is lower (delta < 0) or probability tells to swap worse solution, accept it
-            if (deltaCost < 0 || std::exp(-deltaCost / temp) > distOne(gen)) {
+            if (deltaCost <= 0 || std::exp(-deltaCost / temp) > distOne(gen)) {
                 currentCost = newCost;
 
                 // If the best solution yet found, copy it to bestPath
@@ -197,7 +212,7 @@ int SimulatedAnnealing::solve(Graph* graph) {
                     bestCost = currentCost;
                 }
             } else {
-                swap(currentPath, v1, v2);
+                moveVertex(currentPath, v2, v1);
             }
         }
 

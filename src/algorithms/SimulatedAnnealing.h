@@ -57,6 +57,7 @@ private:
     int size;
     int executionTimeMs;
 
+    void moveVertex(int* path, int from, int to);
     int* generateInitialSolution(int size, Graph* graph);
     double decreaseTemperature(double currentTemp);
     int calculateCost(const int* path, int size, Graph* graph);
