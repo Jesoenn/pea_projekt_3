@@ -15,7 +15,7 @@ App::App() {
 
 void App::run() {
     while (true) {
-//        3 10000 0.0001 0.99 0 15000 1000 0 0 ../data/ATSP/ftv47.atsp
+//       20 700 0.0001 0.99 0 900000 1000 0 0 ../data/ATSP/ftv170.atsp
         // Arguments:
         std::cout<<"\nDane wejsciowe algorytmu: <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf> <sciezka_grafu>\n"
                    "\t<iteracje>: Liczba iteracji >0\n"
