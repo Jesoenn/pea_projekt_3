@@ -13,7 +13,8 @@
 
 SimulatedAnnealing::SimulatedAnnealing() {
     // Default parameters
-    initialTemp = 10000.0;
+    initialTemp =  700.0;
+    initialCost = -1;
     coolingRate = 0.99;
     epochIterations = 1000;
     maxTimeMs = 900000;

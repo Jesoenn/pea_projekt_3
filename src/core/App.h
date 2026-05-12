@@ -12,6 +12,7 @@ class App {
 public:
     App();
     void run();
+    int twoArgVer(const std::string& showGraph, const std::string& filePath);
 
 private:
     bool checkSize(std::string arg, int& value, bool isFileInput);

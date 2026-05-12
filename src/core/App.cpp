@@ -18,6 +18,7 @@ void App::run() {
 //       20 700 0.0001 0.99 0 900000 1000 0 0 ../data/ATSP/ftv170.atsp
         // Arguments:
         std::cout<<"\nDane wejsciowe algorytmu: <iteracje> <temp_pocz> <temp_konc> <ochladzanie> <typ_ochladzania> <czas_maks> <iteracje_epoki> <rozw_poczatkowe> <wyswietl_graf> <sciezka_grafu>\n"
+                   "Dane wejsciowe algorytmu: <wyswietl_graf> <sciezka_grafu>\n"
                    "\t<iteracje>: Liczba iteracji >0\n"
                    "\t<temp_pocz>: Temperatura poczatkowa [double]\n"
                    "\t<temp_konc>: Temperatura koncowa [double]\n"
@@ -47,6 +48,10 @@ void App::run() {
         int i = 0;
         while (ss >> args[i]) {
             i++;
+        }
+        if (i == 2) {
+            int res = twoArgVer(args[0], args[1]);
+            continue;
         }
         if (i != 10) {
             std::cout << "Niepoprawna liczba argumentow\n";
@@ -100,6 +105,26 @@ void App::run() {
         }
         delete graph;
     }
+}
+
+// If two arguments, use default parameters and run algorithm
+int App::twoArgVer(const std::string& showGraph, const std::string& filePath) {
+    bool printGraph = showGraph == "1";
+
+    // Get graph
+    FileManager fileManager(filePath, "wyniki_jf.csv");
+    Graph* graph = fileManager.loadGraph();
+
+    if (printGraph)
+        graph->print();
+
+    SimulatedAnnealing* sa = new SimulatedAnnealing();
+    sa->solve(graph);
+    sa->print();
+
+    delete sa;
+    delete graph;
+    return 0;
 }
 
 bool App::checkSize(std::string arg, int& value, bool isFileInput) {
