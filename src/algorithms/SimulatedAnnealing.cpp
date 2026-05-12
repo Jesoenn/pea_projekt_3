@@ -112,6 +112,7 @@ void SimulatedAnnealing::moveVertex(int* path, int from, int to) {
     path[to] = temp;
 }
 
+// Generate initial solution based on selected type
 int* SimulatedAnnealing::generateInitialSolution(int size, Graph* graph) {
     int* path = new int[size];
     if (initType == InitSolution::RANDOM) {
@@ -133,6 +134,7 @@ int* SimulatedAnnealing::generateInitialSolution(int size, Graph* graph) {
     return path;
 }
 
+// Calculate cost of given path
 int SimulatedAnnealing::calculateCost(const int* path, int size, Graph* graph) {
     int cost = 0;
     for (int i = 0; i < size - 1; i++) {
@@ -155,8 +157,8 @@ double SimulatedAnnealing::decreaseTemperature(double currentTemp) {
 
 
 int SimulatedAnnealing::solve(Graph* graph) {
+    // Delete previous answer
     delete[] bestPath;
-
     size = graph->getSize();
     countEpochs = 0;
 
@@ -179,7 +181,6 @@ int SimulatedAnnealing::solve(Graph* graph) {
 
     // While current temperature is above the ending temperature and time limit is not achieved
     while (temp > endingTemp) {
-        // std::cout<<"Epoch: "<<countEpochs<<"\nTemp: "<<temp<<"\n";
         // Check every epoch if time limit achieved
         if (timer.result() > maxTimeMs) {
             std::cout << "Time limit achieved" << std::endl;
@@ -188,7 +189,6 @@ int SimulatedAnnealing::solve(Graph* graph) {
 
         // Epochs
         countEpochs++;
-        // std::cout<<"Temp: "<<temp<<"\nCost: "<<currentCost<<"\n";
         for (int i = 0; i < epochIterations; i++) {
             // Generate random swap
             int v1 = dist(gen);
@@ -197,12 +197,13 @@ int SimulatedAnnealing::solve(Graph* graph) {
                 v2 = dist(gen);
             }
 
+            // Insert vertex v1 in place of v2
             moveVertex(currentPath, v1, v2);
 
             int newCost = calculateCost(currentPath, size, graph);
             int deltaCost = newCost - currentCost;
 
-            // If cost is lower (delta < 0) or probability tells to swap worse solution, accept it
+            // If cost is lower (delta <= 0) or probability tells to swap worse solution, accept it
             if (deltaCost <= 0 || std::exp(-deltaCost / temp) > distOne(gen)) {
                 currentCost = newCost;
 
@@ -212,6 +213,7 @@ int SimulatedAnnealing::solve(Graph* graph) {
                     bestCost = currentCost;
                 }
             } else {
+                // Reverse insert if not solution is not accepted
                 moveVertex(currentPath, v2, v1);
             }
         }
